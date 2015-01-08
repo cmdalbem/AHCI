@@ -1,0 +1,38 @@
+body {
+	background-color: #333333;
+}
+
+.controlPanel {
+	position: fixed;
+	
+	padding: 8px;
+	
+	background-color: #C5E0DC;
+
+	font-size: 10px;
+
+	opacity: 0.7;
+
+	transition: opacity 0.4s ease-out;
+}
+
+.controlPanel:hover {
+	transition: opacity 0.4s ease-out;
+	opacity: 1;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {  
+    width: 8px;  
+    height: 10px;
+}  
+::-webkit-scrollbar-track {  
+    background-color: #1E1E1C;  
+    border-left: 1px solid #696250;  
+}  
+::-webkit-scrollbar-thumb {  
+    background-color: #696250;  
+}  
+::-webkit-scrollbar-thumb:hover {  
+    background-color: #9A4F32;  
+}  

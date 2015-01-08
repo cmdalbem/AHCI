@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<!-- D3 Lib -->
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+
+		<!-- Stylesheets -->
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="css/barChart.css">
+		
+		<!-- <script src="./SongAnalyzer.js" charset="utf-8"></script> -->
+	</head>
+
+
+
+	<body>
+
+		<!-- CONTROL PANEL -->
+
+		<div class="controlPanel" style="bottom: 0; right: 0;">
+
+			<table style="height: 250px">
+				<td>
+					<div style="height: 100%;">
+						Songs<br>
+						<select size="5" id="songSelect" type='select' onchange='loadSong(value);' style='font-size:1.3em; height: 95%;' >
+						</select>
+					</div>
+				</td>
+
+				<td style="border-right: 1px solid #EEEEEE; margin: 5px;">
+				</td>
+
+				<td>
+					<div style="height: 100%; ">
+						Scales<br>
+						<select size="10" id="scaleSelect" type='select' onchange='updateScale(value);' style='font-size:0.8em; height: 95%;' >
+						</select>
+					</div>
+				</td>
+
+			</table>
+			
+		</div>
+
+		<div class="controlPanel" style="bottom: 0; left: 0;">
+
+			<table style="height: 120px">
+				<td>
+					<p>
+					  <label for="data_radius">
+							 NOTES RADIUS
+					  </label>
+					  <input type="range" min="0" max="10" id="data_radius" style='font-size:1.1em;'>
+					</p>
+
+					<p>
+					  <label for="linesAlpha">
+							 LINES
+					  </label>
+					  <input type="range" min="0" max="100" id="linesAlpha">
+					</p>
+
+					<p>
+					  <label for="scaleHighlights">
+							 SCALE HIGHLIGHTS
+					  </label>
+					  <input type="range" min="0" max="100" id="scaleHighlights">
+					</p>
+
+					<p>
+					  <label for="imageTransparencyCtrl">
+							 FRET BOARD
+					  </label>
+					  <input type="range" min="0" max="100" id="imageTransparencyCtrl">
+					</p>
+				</td>
+			</table>
+			
+		</div>
+
+		
+		<!-- MAIN SCRIPT FILE -->
+
+		<!-- <script type="text/javascript" src="app.js"></script> -->
+        <script data-main="app" src="lib/require.js"></script>
+
+
+	</body>
+
+</html>

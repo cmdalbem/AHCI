@@ -1,0 +1,29 @@
+<html>
+<head>
+
+<!-- d3.js  -->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<!-- Parsing function include -->
+<script src="getNotes.js"></script>
+
+<meta charset="UTF-8">
+</head>
+<body>
+
+<script type="text/javascript">
+
+var f = [];
+f = getNotes("MinorSwing.xml") ;
+
+/* Varyfying the function getNotes() */
+iMax = f.length ;
+for (var i = 0; i < iMax ; i++)
+		{
+	  		document.write(f[i][0]+" ");
+			document.write(f[i][1]+" ");
+			document.write(f[i][2]+" "+"<br>");
+		}
+</script>
+</body>
+</html>
