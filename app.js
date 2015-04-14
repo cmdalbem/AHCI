@@ -24,8 +24,6 @@ require([
 		loadSong("Django Reinhardt - Minor Swing");
 
 		initializeControlPanel();
-
-		
 	}
 );
 
@@ -318,18 +316,20 @@ function loadSong(songName) {
 	var div = container.append("div")
 			.style("width","100%")
 			.style("padding","5px 0 5px 0")
-			.style("overflow-x", "scroll");
+			.style("overflow-x", "hidden");
 
 	// Insert SVG element
 	svg = div.append("svg")
 		.attr("id","fretboard")
-		.attr("width", FRET_IMAGE_WIDTH*SCALE_FACTOR) // dimensions of the fret: image
-		.attr("height", FRET_IMAGE_HEIGHT*SCALE_FACTOR + SVG_VPADDING*2);
+		.attr("width", "100%") // dimensions of the fret: image
+		.attr("height", FRET_IMAGE_HEIGHT*SCALE_FACTOR + SVG_VPADDING*2)
+		.style("cursor","ew-resize");
 
 	svg.append("svg:image")
 		.attr('id',"image")
-		.attr('width', "100%")
-		.attr('height', "100%")
+		.attr('width', FRET_IMAGE_WIDTH*SCALE_FACTOR)
+		.attr('height', FRET_IMAGE_HEIGHT*SCALE_FACTOR)
+		.attr('y', SVG_VPADDING)
 		.attr("xlink:href","img/neck.jpg");
 		// .attr('opacity', '0');
 
@@ -479,6 +479,27 @@ function loadSong(songName) {
 			.style("fill","white");
 
 	// g.exit().remove();
+
+	svgPanZoom('#fretboard', {
+		  viewportSelector: '.svg-pan-zoom_viewport'
+		, panEnabled: true
+		, controlIconsEnabled: false
+		, zoomEnabled: false
+		// , dblClickZoomEnabled: true
+		// , zoomScaleSensitivity: 0.2
+		// , minZoom: 0.5
+		// , maxZoom: 10
+		, fit: false
+		, center: false
+		, refreshRate: 'auto'
+		// , beforeZoom: function(){}
+		// , onZoom: function(){}
+		, beforePan: function(){
+			return {x: true, y: false};
+		}
+		// , onPan: function(){}
+		// , customEventsHandler: {}
+	});
 
 	////////////////////////////////////////////////////////////////////////////
 
