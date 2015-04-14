@@ -5,24 +5,61 @@
 
 // Management of module dependencies by the lib require.js
 require([
+	"defaults",
 	"SongAnalyzer",
 	// "scales",
 	// "chords",
 	"guitarConstants",
 	"songs"
 ],
-	// Function called only when all dependencies have been loaded
+	// Function called only after all dependencies have been loaded
 	function() {
+		applyScaleFactor();	
+		initializeGlobals();
+
 		analyzer = new SongAnalyzer();
 
-		fillSongsSelectionList();	
+		fillSongsSelectionList();
 
-		loadSong(Object.keys(songs)[0]);
+		loadSong("Django Reinhardt - Minor Swing");
 
 		initializeControlPanel();
+
+		
 	}
 );
 
+function applyScaleFactor() {
+	SVG_VPADDING *= SCALE_FACTOR;
+	LINES_WIDTH *= SCALE_FACTOR;
+	NOTES_FONT_SIZE *= SCALE_FACTOR;
+	SCALE_HIGHTLIGHT_RECT_HEIGHT *= SCALE_FACTOR;
+	DEFAULT_NOTES_SIZE *= SCALE_FACTOR;
+	
+	var i;
+	for(i in stringCoords) {
+		stringCoords[i] *= SCALE_FACTOR;
+	}
+	for(i in fretWidths) {
+		fretWidths[i] *= SCALE_FACTOR;
+	}
+	for(i in fretCoords) {
+		fretCoords[i] *= SCALE_FACTOR;
+	}
+
+
+	// var panelDivs = document.getElementsByClassName("controlPanel");
+	// for(i=0; i<panelDivs.length; i++) {
+	// 	panelDivs[i].style.width = (parseInt(panelDivs[i].style.width,10) * SCALE_FACTOR) + "px";
+	// }
+}
+
+function initializeGlobals() {
+	notesRadius = DEFAULT_NOTES_SIZE;
+	linesTransparency = DEFAULT_LINES_TRANSPARENCY;
+	scaleHighlightsTransparency = DEFAULT_SCALEHIGHLIGHTS_TRANSPARENCY;
+	imageTransparency = DEFAULT_IMAGE_TRANSPARENCY;
+}
 
 // Configuration of control panels
 function initializeControlPanel() {
@@ -69,15 +106,40 @@ function initializeControlPanel() {
 	updateStyleConfig("imageTransparencyCtrl", "image", DEFAULT_IMAGE_TRANSPARENCY*100);
 }
 
+function highlightNoteClass(noteClass) {
+	d3.selectAll("."+noteClass)
+		// .transition()
+		.style("stroke-opacity", "0");
+
+	// Show tooltip on the barchart corresponding to this class
+	// var note = noteClass.split("note_")[1];
+	// if(note) {
+	// 	var a = tip.show(note);
+	// }
+}
+
+function unhighlightNoteClass(noteClass) {
+	d3.selectAll("."+noteClass)
+		// .transition()
+		.style("stroke", "white")
+		.style("stroke-width", "3")
+		.style("stroke-opacity", "0.8");
+
+	// var note = noteClass.split("note_")[1];
+	// if(note) {
+	// 	tip.show(note);
+	// }
+}
+
 // Fill up combobox of songs selection with DataBase
 function fillSongsSelectionList() {
 	var select = document.getElementById("songSelect"); 
-	Object.keys(songs).forEach( function(i, index) {
+	Object.keys(songs).sort().forEach( function(i, index) {
 		var opt = i;
 	    var el = document.createElement("option");
 	    el.textContent = opt;
 	    el.value = i;
-	    el.selected = index===0 ? true : false;
+	    // el.selected = index===0 ? true : false;
 	    select.appendChild(el);
  	});
 }
@@ -104,44 +166,6 @@ function fillScalesSelectionList(scalesList) {
  	});
 }
 
-//////////////////////
-// GLOBAL CONSTANTS //
-//////////////////////
-
-// Cool colors thanks for http://www.colourlovers.com/palettes
-// seeker of truth
-// #131313, #1E1E1C, #54382C, #817952, #9A4F32
-
-// True North Analogous
-// #8D543C, #974D40, #803D3D, #FFF5EE, #333333
-
-// Ocean Five
-// #00A0B0, #6A4A3C, #CC333F, #EB6841, #EDC951
-
-// Giant Goldfish
-// #69D2E7, #A7DBD8, #E0E4CC, #F38630, #FA6900
-
-// let them eat cake
-// #774F38, #E08E79, #F1D4AF, #ECE5CE, #C5E0DC
-
-var palletes = [
-	["#CC333F", "#00A0B0", "#EDC951", "#E08E79"],
-	["purple" , "#CC333F",  "#00A0B0", "#EB6841"]
-];
-var aPallete = palletes[0];
-
-var NOTES_HIGHLIGHT_COLOR = aPallete[0];
-var NOTESCOLOR = aPallete[1];
-var CURVECOLOR = aPallete[2];
-var SCALE_NOTE_COLOR = aPallete[3];
-
-var LINES_WIDTH = "2";
-
-var DEFAULT_NOTES_SIZE = "9";
-var DEFAULT_SCALEHIGHLIGHTS_TRANSPARENCY = 0;
-var DEFAULT_LINES_TRANSPARENCY = 0.1;
-var DEFAULT_IMAGE_TRANSPARENCY = 1;
-
 
 //////////////////////
 // GLOBAL variables //
@@ -154,10 +178,12 @@ var maxNotesPerPosition;
 var notesMatrix;
 var svg;
 
-var notesRadius = DEFAULT_NOTES_SIZE;
-var linesTransparency = DEFAULT_LINES_TRANSPARENCY;
-var scaleHighlightsTransparency = DEFAULT_SCALEHIGHLIGHTS_TRANSPARENCY;
-var imageTransparency = DEFAULT_IMAGE_TRANSPARENCY;
+var notesRadius;
+var linesTransparency;
+var scaleHighlightsTransparency;
+var imageTransparency;
+
+var tip;
 
 
 //////////////////////
@@ -171,22 +197,20 @@ function updateScale(scaleName) {
 	svg.selectAll("rect")
 		.data(scaleNotesPositions)
 		.attr("width", function(d) { return fretWidths[d.fret]; })
-		.attr("height", 20)
+		.attr("height", SCALE_HIGHTLIGHT_RECT_HEIGHT)
 		.attr("opacity", scaleHighlightsTransparency )
-		.attr("x", function(d) { return fretCoords[d.fret]-fretWidths[d.fret]/2; })
-		.attr("y", function(d) { return stringCoords[d.string]-10; })
+		.attr("x", function(d) { return fretCoords[d.fret] - fretWidths[d.fret]/2; })
+		.attr("y", function(d) { return stringCoords[d.string] - SCALE_HIGHTLIGHT_RECT_HEIGHT/2; })
 		.attr("fill", SCALE_NOTE_COLOR );
 
 	// Update note circles colors
 	var circles = svg.selectAll("circle")[0];
 	if (circles) {
 		circles.forEach( function(c) {
-			var id = c.id.split(",");
-			var i = id[0];
-			var j = id[1];
+			var whichNote = c.getAttribute("class").split("note_")[1];
 
 			if (c.getAttribute("fill") != "grey") {
-				if (selectedScale && scales[selectedScale].indexOf(notesMap[i][j])<0) {
+				if (selectedScale && scales[selectedScale].indexOf(whichNote)<0) {
 					c.setAttribute("fill", NOTES_HIGHLIGHT_COLOR);
 				} else {	
 					c.setAttribute("fill", NOTESCOLOR);
@@ -198,6 +222,13 @@ function updateScale(scaleName) {
 }
 
 function loadSong(songName) {
+
+ 	// Select the right song in the songs list
+ 	var listOfSongs = document.getElementById('songSelect').getElementsByTagName('option');
+ 	for (var i=0; i<listOfSongs.length; i++) {
+ 		if (listOfSongs[i].value == songName)
+ 			listOfSongs[i].selected = 'selected';
+ 	};
 
 	//////////
 	// DATA //
@@ -268,13 +299,21 @@ function loadSong(songName) {
 	// Initializations  //
 	//////////////////////
 
-	// Clean workspace
-	d3.select("#container").remove()
+	// Clear workspace
+	// d3.select("#container").remove()
 	
 	// Container DIV
-	var container = d3.select("body")
-					.append("div")
-					.attr("id","container");
+	// var container = d3.select("body")
+					// .append("div")
+					// .attr("id","container");
+	var container = d3.select("#container");
+	container[0][0].innerHTML = "";
+
+	var p = d3.select("#container").append("div")
+		.attr("class","centralized")
+		.style("width",(120*SCALE_FACTOR)+"px");
+	p = p[0][0];
+ 	p.innerHTML = notesTotal + " notes loaded.";
 
 	var div = container.append("div")
 			.style("width","100%")
@@ -284,8 +323,8 @@ function loadSong(songName) {
 	// Insert SVG element
 	svg = div.append("svg")
 		.attr("id","fretboard")
-		.attr("width", 1857) // dimensions of the fret: image
-		.attr("height", 118);
+		.attr("width", FRET_IMAGE_WIDTH*SCALE_FACTOR) // dimensions of the fret: image
+		.attr("height", FRET_IMAGE_HEIGHT*SCALE_FACTOR + SVG_VPADDING*2);
 
 	svg.append("svg:image")
 		.attr('id',"image")
@@ -298,12 +337,15 @@ function loadSong(songName) {
 	////////////////////////////////////////////////////////////////////////////
 
 
-	//////////////
-	// PLOTTING //
-	//////////////
+	////////////////////
+	//////// PLOTTING //
+	////////////////////
 
 
-	// Lines
+	///////////
+	// Lines //
+	///////////
+
 	var pairs = d3.pairs(songNotes);
 	// var colorGradient = d3.scale.linear()
 	//   .domain([0,pairs.length])
@@ -317,10 +359,11 @@ function loadSong(songName) {
 		// Crazy function that creates a cool slightly bended curve
 		.attr("d", function(d) {
 			if ( d[0].fret-1 >= 0 && d[0].string-1 >= 0 && d[1].fret-1 >= 0 && d[1].string-1 >= 0 ) {
-				var sx = fretCoords[d[0].fret-1], sy = stringCoords[d[0].string-1],
-				tx = fretCoords[d[1].fret-1], ty = stringCoords[d[1].string-1],
-				dx = tx - sx, dy = ty - sy,
-				dr = 2 * Math.sqrt(dx * dx + dy * dy);
+				var sx = fretCoords[d[0].fret-1];
+				var sy = stringCoords[d[0].string-1];
+				var tx = fretCoords[d[1].fret-1], ty = stringCoords[d[1].string-1];
+				var dx = tx - sx, dy = ty - sy;
+				var dr = 2 * Math.sqrt(dx * dx + dy * dy);
 				return "M" + sx + "," + sy + "A" + dr + "," + dr + " 0 0,1 " + tx + "," + ty;
 			}
 			else {
@@ -329,16 +372,16 @@ function loadSong(songName) {
 
 		  })
 		.on("mouseover", function(d) { 
-				d3.select(this)
-					// .transition()
-					// .ease("easeOutQuint")
-					.style("opacity", 1); 
-			})
-			.on("mouseout", function(d) {
-				d3.select(this)
-					.transition()
-					.style("opacity", linesTransparency );
-			})
+			d3.select(this)
+				// .transition()
+				// .ease("easeOutQuint")
+				.style("opacity", 1); 
+		})
+		.on("mouseout", function(d) {
+			d3.select(this)
+				.transition()
+				.style("opacity", linesTransparency );
+		})
 		.style("stroke", CURVECOLOR)
 		// .style("stroke", function(d,i) {  return colorGradient(i); } )
 		.style("fill", "none")
@@ -359,10 +402,10 @@ function loadSong(songName) {
 		.enter()
 		.append("rect")
 			.attr("width", function(d) { return fretWidths[d.fret]; })
-			.attr("height", 20)
+			.attr("height", SCALE_HIGHTLIGHT_RECT_HEIGHT)
 			.attr("opacity", scaleHighlightsTransparency )
-			.attr("x", function(d) { return fretCoords[d.fret]-fretWidths[d.fret]/2; })
-			.attr("y", function(d) { return stringCoords[d.string]-10; })
+			.attr("x", function(d) { return fretCoords[d.fret] - fretWidths[d.fret]/2; })
+			.attr("y", function(d) { return stringCoords[d.string] - SCALE_HIGHTLIGHT_RECT_HEIGHT/2; })
 			.attr("fill", SCALE_NOTE_COLOR );
 	
 	// Create a SVG group for each fret ...
@@ -371,32 +414,35 @@ function loadSong(songName) {
 		.enter()
 		.append("g");
 
-	// And then of each fret iterate by the strings, creating as well one SVG
-	//   group for each one.
+	// ... And then of each fret iterate by the strings, creating as well one
+	//   SVG group for each one.
 	var g = divs.selectAll("g")
 		.data(function(d) { return d; })
 		.enter()
 		.append("g")
 			// The transform property will set the right position of the note
-			.attr("transform", function(d,i,j) { return "translate(" + fretCoords[j] + "," + stringCoords[i] + ")"; } )
+			.attr("transform", function(d,i,j) { return "translate(" + fretCoords[j] + "," + (stringCoords[i]) + ")"; } )
 			// The opacity will be given by a scaler that maps the note frequency
 			//    to the opacity scale set earlier.
 			.attr("opacity", function(d) { return scaler(d); })
 			// The following 2 properties are for interactivity
-			.on("mouseover", function(d) { 
+			.on("mouseover", function(d,i,j) { 
+				unhighlightNoteClass("note_"+notesMap[i][j]);
 				d3.select(this)
 					// .transition()
 					// .ease("easeOutQuint	")
-					.style("opacity", 1); 
+					.style("opacity", 1)
 			})
-			.on("mouseout", function(d) {
+			.on("mouseout", function(d,i,j) {
+				highlightNoteClass("note_"+notesMap[i][j]);
 				d3.select(this)
 					.transition()
-					.style("opacity", scaler(d) );
+					.style("opacity", scaler(d) )
 			});
 
 	// Adds svg circle
 	g.append("circle")
+			.attr("class", function(d,i,j) { return "note_" + notesMap[i][j]; })
 			.attr("id", function(d,i,j) { return i + "," + j; })
 			.attr("r", notesRadius)
 			.attr("fill", function(d, i, j) { 
@@ -424,8 +470,9 @@ function loadSong(songName) {
 			// .attr("x", fretCoords[i] )
 			// .attr("y", function(d,j) { return stringCoords[j]; })
 		    // .attr("opacity", function(d) { return scaler(d); })
+		    .attr('class', 'noselect')
 		    .style("font-family", "sans-serif")
-			.style("font-size", "11px")
+			.style("font-size", NOTES_FONT_SIZE)
 			.style("text-anchor", "middle")
 			.style("dominant-baseline", "middle")
 			.style("pointer-events", "none")
@@ -439,9 +486,6 @@ function loadSong(songName) {
 	////////////////
 	// STATISTICS //
 	////////////////
-
- 	var p = d3.select("#container").append("div")[0][0];
- 	p.innerHTML = notesTotal + " notes loaded";
 
 	addBarChart(notesCount);
 
@@ -470,7 +514,8 @@ function addBarChart(data) {
 	    .scale(y)
 	    .orient("left");
 
-	var tip = d3.tip()
+	// global
+	tip = d3.tip()
 		.attr('class', 'd3-tip')
 		.offset([-10, 0])
 		.html(function(d) {
@@ -480,9 +525,8 @@ function addBarChart(data) {
 	var width = width + margin.left + margin.right;
 
 	var container = d3.select("#container").append("div")
+		.attr("class", "centralized")
 		.style("width", width+"px")
-		.style("margin-left","auto")
-		.style("margin-right","auto");
 		// .style("background-color", "#444444");
 
 	var chartSvg = container.append("svg")
@@ -516,12 +560,18 @@ function addBarChart(data) {
 	chartSvg.selectAll(".bar")
 		.data(Object.keys(data))
 		.enter().append("rect")
-		.attr("class", "bar")
+		.attr("class", function(d) { return "bar note_"+d;  })
 		.attr("x", function(d) { return x(d); })
 		.attr("width", x.rangeBand())
 		.attr("y", function(d) { return y(data[d]); })
 		.attr("height", function(d) { return height - y(data[d]); })
-		.on('mouseover', tip.show)
-      	.on('mouseout', tip.hide);
+      	.on("mouseout", function(d) { 
+  			tip.hide(d);
+  			highlightNoteClass(this.getAttribute("class").split(" ")[1]);
+		})
+      	.on("mouseover", function(d) { 
+  			tip.show(d);
+  			unhighlightNoteClass(this.getAttribute("class").split(" ")[1]);
+		});
 
 }

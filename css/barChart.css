@@ -10,7 +10,7 @@
 }
 
 .bar:hover {
-  /*fill: red ;*/
+  fill: red ;
 }
 
 /* Creates a small triangle extender for the tooltip */
