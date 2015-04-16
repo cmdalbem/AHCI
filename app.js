@@ -28,11 +28,13 @@ require([
 );
 
 function applyScaleFactor() {
-	SVG_VPADDING *= SCALE_FACTOR;
-	LINES_WIDTH *= SCALE_FACTOR;
-	NOTES_FONT_SIZE *= SCALE_FACTOR;
+	SVG_VPADDING 			*= SCALE_FACTOR;
+	LINES_WIDTH 			*= SCALE_FACTOR;
+	NOTES_FONT_SIZE 		*= SCALE_FACTOR;
+	DEFAULT_NOTES_SIZE 		*= SCALE_FACTOR;
+	FRET_IMAGE_WIDTH 		*= SCALE_FACTOR;
+	FRET_IMAGE_HEIGHT 		*= SCALE_FACTOR;
 	SCALE_HIGHTLIGHT_RECT_HEIGHT *= SCALE_FACTOR;
-	DEFAULT_NOTES_SIZE *= SCALE_FACTOR;
 	
 	var i;
 	for(i in stringCoords) {
@@ -157,7 +159,7 @@ function fillScalesSelectionList(scalesList) {
 		var score = i[1];
 
 	    var el = document.createElement("option");
-	    el.textContent = (score*100).toFixed(2) + "% - " + name;
+	    el.textContent = "[" + (score*100).toFixed(2) + "%]  " + name;
 	    el.value = name;
 	    el.selected = index===0 ? true : false;
 	    select.appendChild(el);
@@ -308,27 +310,27 @@ function loadSong(songName) {
 	container[0][0].innerHTML = "";
 
 	var p = d3.select("#container").append("div")
-		.attr("class","centralized")
+		.attr("class","centralized muted")
 		.style("width",(120*SCALE_FACTOR)+"px");
 	p = p[0][0];
  	p.innerHTML = notesTotal + " notes loaded.";
 
-	var div = container.append("div")
-			.style("width","100%")
-			.style("padding","5px 0 5px 0")
-			.style("overflow-x", "hidden");
+	var div = container.append("div");
+			// .style("width","100%")
+			// .style("padding","5px 0 5px 0")
+			// .style("overflow-x", "hidden");
 
 	// Insert SVG element
 	svg = div.append("svg")
 		.attr("id","fretboard")
 		.attr("width", "100%") // dimensions of the fret: image
-		.attr("height", FRET_IMAGE_HEIGHT*SCALE_FACTOR + SVG_VPADDING*2)
+		.attr("height", FRET_IMAGE_HEIGHT + SVG_VPADDING*2)
 		.style("cursor","ew-resize");
 
 	svg.append("svg:image")
 		.attr('id',"image")
-		.attr('width', FRET_IMAGE_WIDTH*SCALE_FACTOR)
-		.attr('height', FRET_IMAGE_HEIGHT*SCALE_FACTOR)
+		.attr('width', FRET_IMAGE_WIDTH)
+		.attr('height', FRET_IMAGE_HEIGHT)
 		.attr('y', SVG_VPADDING)
 		.attr("xlink:href","img/neck.jpg");
 		// .attr('opacity', '0');

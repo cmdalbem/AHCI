@@ -25,13 +25,13 @@
 
 		<!-- CONTROL PANEL -->
 
-		<div id="controlPanel1" class="controlPanel centralized" style="bottom: 0; right: 0; width: 520px;">
+		<div id="controlPanel1" class="controlPanel centralized" style="width: 800px; ">
 
-			<table style="height: 225px;">
+			<table style="height: 250px;">
 				<td>
-					<div style="height: 100%;">
-						Songs<br>
-						<select size="5" id="songSelect" type='select' onchange='loadSong(value);' style='font-size:0.8em; height: 95%;' >
+					<div style="height: 210px;">
+						<div class="title">Songs</div>
+						<select size="5" id="songSelect" type='select' onchange='loadSong(value);' style='font-size:0.8em; height: 95%; width: 300px' >
 						</select>
 					</div>
 				</td>
@@ -39,9 +39,9 @@
 				<!-- <td style="border-right: 1px solid #8D8D8D; margin: 5px;"> </td> -->
 
 				<td>
-					<div style="height: 100%; ">
-						Scales<br>
-						<select size="10" id="scaleSelect" type='select' onchange='updateScale(value);' style='font-size:0.8em; height: 95%;' >
+					<div style="height: 210px; ">
+						<div class="title">Scales</div>
+						<select size="10" id="scaleSelect" type='select' onchange='updateScale(value);' style='font-size:0.8em; height: 95%; width: 440px; word-wrap: break-word;' >
 						</select>
 					</div>
 				</td>
@@ -52,7 +52,7 @@
 
 		<div id="container"></div>
 
-		<div id="controlPanel2" class="controlPanel centralized" style="bottom: 0; left: 0; width: 360px; display: none;">
+		<div id="controlPanel2" class="controlPanel centralized" style="width: 360px; display: none;">
 
 			<table style="height: 180px;">
 				<td style="width: 100px;">

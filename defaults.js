@@ -2,7 +2,7 @@
 // defaults.js
 //
 
-var SCALE_FACTOR = 1.5;
+var SCALE_FACTOR = 1.3;
 
 
 // Cool colors thanks for http://www.colourlovers.com/palettes
