@@ -452,7 +452,7 @@ function collapseScales(listOfScales) {
 		collapsedScales[names] = listOfScales[s1];
 
 		// Print result
-		console.log("\"" + names + "\": [" + listOfScales[s1] + "]");
+		// console.log("\"" + names + "\": [" + listOfScales[s1] + "]");
 	});
 
 	return collapsedScales;
@@ -464,23 +464,57 @@ function SongAnalyzer() {
 
 }
 
-SongAnalyzer.prototype.guessScale = function (notesFrequencies) {
+var positiveFrequencyScore = function (aScale, notesCount, notesTotal) {
+	var score = 0;
 
-	var scaleScores = {};
+	// Calculate frequencies of notes
+	var notesFrequencies = {};
+	Object.keys(notesCount).forEach( function(i) {
+		notesFrequencies[i] = notesCount[i]/notesTotal;
+ 	});
+
+	scales[aScale].forEach(function(aNote) {
+		if (notesFrequencies[aNote]) {
+			score += notesFrequencies[aNote];
+		}
+	});
+	score = (score*100).toFixed(2);
+
+	return score;
+}
+
+var balancedNotesCountScore = function (aScale, notesCount, notesTotal) {
+	var score = 0;
+
+	var notesOutsideScale = 0;
+	Object.keys(notesCount).forEach(function(aNote) {
+		var isNoteInScale = scales[aScale].indexOf(aNote) >= 0;
+		if (notesCount[aNote] > 0) {
+			if (!isNoteInScale) {
+				notesOutsideScale++;
+			}
+			score += notesCount[aNote] * (isNoteInScale ? 1 : -1);
+		}
+	});
+
+	if(notesOutsideScale > 0) {
+		score = 0;
+	}
+
+	return score;
+}
+
+SongAnalyzer.prototype.guessScale = function (notesCount, notesTotal) {
+
+	var score;
 	var scalesWithScores = [];
 
+	// Measure fitting score for all scales
 	Object.keys(scales).forEach( function(aScale) {
-		// console.log(scales[aScale]);
-		
-		scaleScores[aScale] = 0;
+		score = positiveFrequencyScore(aScale, notesCount, notesTotal);
+		// score = balancedNotesCountScore(aScale, notesCount, notesTotal);
 
-		scales[aScale].forEach(function(aNote) {
-			if (notesFrequencies[aNote]) {
-				scaleScores[aScale] += notesFrequencies[aNote];
-			}
-		});
-
-		scalesWithScores.push([aScale, scaleScores[aScale]]);
+		scalesWithScores.push([aScale, score]);
 
 	});
 
@@ -491,12 +525,12 @@ SongAnalyzer.prototype.guessScale = function (notesFrequencies) {
 };
 
 // Construct list of positions of notes of the scale
-SongAnalyzer.prototype.getScaleNotesPositions = function(scale) {
+SongAnalyzer.prototype.getScaleNotesPositions = function(aScale) {
 	var scaleNotesPositions = [];
 
 	for (var fret=0; fret<nfrets; fret++) {
 		for (var string=0; string<nstrings; string++) {
-			if (scales[scale].indexOf(notesMap[string][fret]) >= 0) {
+			if (scales[aScale].indexOf(notesMap[string][fret]) >= 0) {
 				scaleNotesPositions.push({"fret": fret, "string": string});
 				// console.log(fret + "," + string);
 			}

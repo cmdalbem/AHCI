@@ -159,7 +159,7 @@ function fillScalesSelectionList(scalesList) {
 		var score = i[1];
 
 	    var el = document.createElement("option");
-	    el.textContent = "[" + (score*100).toFixed(2) + "%]  " + name;
+	    el.textContent = "[" + score + "%]  " + name;
 	    el.value = name;
 	    el.selected = index===0 ? true : false;
 	    select.appendChild(el);
@@ -238,7 +238,7 @@ function loadSong(songName) {
 
 	var notesTotal = 0;	
 	notesMatrix = [];
-	var notesCount = { "C": 0,"Db": 0,"D": 0,"Eb": 0,"E": 0,"F": 0,"Gb": 0,"G": 0,"Ab": 0,"A": 0,"Bb": 0,"B": 0 };
+	var notesCount = { "C": 0,"C#": 0,"D": 0,"D#": 0,"E": 0,"F": 0,"F#": 0,"G": 0,"G#": 0,"A": 0,"A#": 0,"B": 0 };
 	for(var i=0; i<nfrets; i++) {
 		notesMatrix[i] = new Array(nstrings);
 		for(var j=0; j<nstrings; j++) {
@@ -281,14 +281,8 @@ function loadSong(songName) {
 	});
 	maxNotesPerPosition = d3.max(notesMatrix, function(d) { return d3.max(d); });
 
-	// Calculates frequencies of notes
-	var notesFrequencies = {};
-	Object.keys(notesCount).forEach( function(i) {
-		notesFrequencies[i] = notesCount[i]/notesTotal;
- 	});
-
 	// Analyze song
-	var scaleScores = analyzer.guessScale(notesFrequencies);
+	var scaleScores = analyzer.guessScale(notesCount,notesTotal);
 	fillScalesSelectionList(scaleScores);
 
 	// updateScale(scaleScores[0][0]);
