@@ -315,23 +315,22 @@ function loadSong(songName) {
 	p = p[0][0];
  	p.innerHTML = notesTotal + " notes loaded.";
 
-	var div = container.append("div");
-			// .style("width","100%")
-			// .style("padding","5px 0 5px 0")
-			// .style("overflow-x", "hidden");
+	var div = container.append("div")
+			.style("width","100%")
+			.style("padding","5px 0 5px 0")
+			.style("overflow-x", "hidden");
 
 	// Insert SVG element
 	svg = div.append("svg")
 		.attr("id","fretboard")
-		.attr("width", "100%") // dimensions of the fret: image
-		.attr("height", FRET_IMAGE_HEIGHT + SVG_VPADDING*2)
-		.style("cursor","ew-resize");
+		.style("cursor","ew-resize")
+		.attr("width", FRET_IMAGE_WIDTH) // dimensions of the fret: image
+		.attr("height", FRET_IMAGE_HEIGHT + SVG_VPADDING*2);
 
 	svg.append("svg:image")
 		.attr('id',"image")
-		.attr('width', FRET_IMAGE_WIDTH)
-		.attr('height', FRET_IMAGE_HEIGHT)
-		.attr('y', SVG_VPADDING)
+		.attr('width', "100%")
+		.attr('height', "100%")
 		.attr("xlink:href","img/neck.jpg");
 		// .attr('opacity', '0');
 
