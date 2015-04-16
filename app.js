@@ -323,7 +323,7 @@ function loadSong(songName) {
 	// Insert SVG element
 	svg = div.append("svg")
 		.attr("id","fretboard")
-		.style("cursor","ew-resize")
+		.style("cursor","move")
 		.attr("width", FRET_IMAGE_WIDTH) // dimensions of the fret: image
 		.attr("height", FRET_IMAGE_HEIGHT + SVG_VPADDING*2);
 
@@ -433,12 +433,13 @@ function loadSong(songName) {
 					// .transition()
 					// .ease("easeOutQuint	")
 					.style("opacity", 1)
+					.style("cursor","default");
 			})
 			.on("mouseout", function(d,i,j) {
 				highlightNoteClass("note_"+notesMap[i][j]);
 				d3.select(this)
 					.transition()
-					.style("opacity", scaler(d) )
+					.style("opacity", scaler(d) );
 			});
 
 	// Adds svg circle
