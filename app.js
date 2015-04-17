@@ -54,6 +54,32 @@ function applyScaleFactor() {
 	// }
 }
 
+function sanitizeNoteClass(noteClass) {
+	if (noteClass.length==1) {
+		return noteClass;
+	}
+	else if(noteClass[1]=="#") {
+		return noteClass[0] + "s";
+	}
+	else {
+		console.error("weird noteClass: " + noteClass);
+		return "-";
+	}
+}
+
+function reverseSanitizeNoteClass(noteclass) {
+	if (noteClass.length==1) {
+		return noteClass;
+	}
+	else if(noteClass[1]=="s") {
+		return noteClass[0] + "#";
+	}
+	else {
+		console.error("weird noteClass: " + noteClass);
+		return "-";
+	}
+}
+
 function initializeGlobals() {
 	notesRadius = DEFAULT_NOTES_SIZE;
 	linesTransparency = DEFAULT_LINES_TRANSPARENCY;
@@ -207,7 +233,7 @@ function updateScale(scaleName) {
 	var circles = svg.selectAll("circle")[0];
 	if (circles) {
 		circles.forEach( function(c) {
-			var whichNote = c.getAttribute("class").split("note_")[1];
+			var whichNote = reverseSanitizeNoteClass(c.getAttribute("class").split("note_")[1]);
 
 			if (c.getAttribute("fill") != "grey") {
 				if (selectedScale && scales[selectedScale].indexOf(whichNote)<0) {
@@ -301,6 +327,7 @@ function loadSong(songName) {
 					// .append("div")
 					// .attr("id","container");
 	var container = d3.select("#container");
+	// container.transition().style("opacity","0");
 	container[0][0].innerHTML = "";
 
 	var p = d3.select("#container").append("div")
@@ -422,7 +449,7 @@ function loadSong(songName) {
 			.attr("opacity", function(d) { return scaler(d); })
 			// The following 2 properties are for interactivity
 			.on("mouseover", function(d,i,j) { 
-				unhighlightNoteClass("note_"+notesMap[i][j]);
+				unhighlightNoteClass("note_" + sanitizeNoteClass(notesMap[i][j])) ;
 				d3.select(this)
 					// .transition()
 					// .ease("easeOutQuint	")
@@ -430,7 +457,7 @@ function loadSong(songName) {
 					.style("cursor","default");
 			})
 			.on("mouseout", function(d,i,j) {
-				highlightNoteClass("note_"+notesMap[i][j]);
+				highlightNoteClass("note_"+sanitizeNoteClass(notesMap[i][j]));
 				d3.select(this)
 					.transition()
 					.style("opacity", scaler(d) );
@@ -438,7 +465,7 @@ function loadSong(songName) {
 
 	// Adds svg circle
 	g.append("circle")
-			.attr("class", function(d,i,j) { return "note_" + notesMap[i][j]; })
+			.attr("class", function(d,i,j) { return "note_" + sanitizeNoteClass(notesMap[i][j]); })
 			.attr("id", function(d,i,j) { return i + "," + j; })
 			.attr("r", notesRadius)
 			.attr("fill", function(d, i, j) { 
@@ -505,6 +532,11 @@ function loadSong(songName) {
 	////////////////
 
 	addBarChart(notesCount);
+
+
+
+	// Show everything finally
+	// container.transition().style("opacity","1");
 
 }
 
@@ -577,7 +609,7 @@ function addBarChart(data) {
 	chartSvg.selectAll(".bar")
 		.data(Object.keys(data))
 		.enter().append("rect")
-		.attr("class", function(d) { return "bar note_"+d;  })
+		.attr("class", function(d) { return "bar note_"+sanitizeNoteClass(d);  })
 		.attr("x", function(d) { return x(d); })
 		.attr("width", x.rangeBand())
 		.attr("y", function(d) { return y(data[d]); })
